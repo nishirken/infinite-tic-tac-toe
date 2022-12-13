@@ -274,6 +274,31 @@ describe('Infinite tic-tac toe', () => {
         });
 
         /**
+         * |X|0| |0| |0|
+         * | | |X| | | |
+         * | |0| | | | |
+         * | | | |X| | |
+         * | | | | |X| |
+         * | | | | | |X|
+         */
+         test('When n is less then cosequence', () => {
+            const state = { ...defaultState, n: 2 };
+            const res = compose(
+                move({x: 0, y: 0}, Player.First),
+                move({x: 1, y: 0}, Player.Second),
+                move({x: 2, y: 1}, Player.First),
+                move({x: 1, y: 2}, Player.Second),
+                move({x: 3, y: 3}, Player.First),
+                move({x: 3, y: 0}, Player.Second),
+                move({x: 5, y: 5}, Player.First),
+                move({x: 5, y: 0}, Player.Second),
+                move({x: 4, y: 4}, Player.First),
+            )(state);
+
+            expect(res.winner).toBe(Player.First);
+        });
+
+        /**
          * |X|X| | | |0|
          * | |X| | |0| |
          * | | | | | | |

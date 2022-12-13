@@ -55,23 +55,22 @@ const pointToString = ({x, y}: Point): string => {
  * XXC-- - if C == 1, then counter = 3
  * --C-- - counter = 1
  */
-const count = (xs: Record<number, number>, initialCoord: number, player: Player): number => {
+const count = (xs: Record<number, number>, initialCoord: number, player: Player, n: number): number => {
     let l = initialCoord;
     let r = initialCoord;
-    let leftCounter = 0;
-    let rightCounter = 0;
+    let counter = 0;
 
-    while (xs[l] === player) {
-        leftCounter++;
+    while (xs[l] === player && counter <= n) {
         l--;
+        counter++;
     }
 
-    while (xs[r] === player) {
-        rightCounter++;
+    while (xs[r] === player && counter <= n) {
         r++;
+        counter++;
     }
 
-    return leftCounter + rightCounter - 1;
+    return counter - 1;
 };
 
 export const move = (point: Point, player: Player) => (prevState: State): State => {
@@ -102,7 +101,7 @@ export const move = (point: Point, player: Player) => (prevState: State): State 
 
     const currentRow = rows[point.y];
     currentRow[point.x] = player;
-    const rowsCounter = count(currentRow, point.x, player);
+    const rowsCounter = count(currentRow, point.x, player, prevState.n);
 
     if (rowsCounter === prevState.n) {
         return {
@@ -113,7 +112,7 @@ export const move = (point: Point, player: Player) => (prevState: State): State 
     
     const currentCol = cols[point.x];
     currentCol[point.y] = player;
-    const colsCounter = count(currentCol, point.y, player);
+    const colsCounter = count(currentCol, point.y, player, prevState.n);
 
     if (colsCounter === prevState.n) {
         return {
@@ -124,7 +123,7 @@ export const move = (point: Point, player: Player) => (prevState: State): State 
 
     const currentDiagonal = diagonals[pointToString(diagonalPoint)];
     currentDiagonal[point.x] = player;
-    const diagonalCounter = count(currentDiagonal, point.x, player);
+    const diagonalCounter = count(currentDiagonal, point.x, player, prevState.n);
 
     if (diagonalCounter === prevState.n) {
         return {
@@ -135,7 +134,7 @@ export const move = (point: Point, player: Player) => (prevState: State): State 
 
     const currentCoDiagonal = coDiagonals[pointToString(coDiagonalPoint)];
     currentCoDiagonal[point.x] = player;
-    const coDiagonalCounter = count(currentCoDiagonal, point.x, player);
+    const coDiagonalCounter = count(currentCoDiagonal, point.x, player, prevState.n);
 
     if (coDiagonalCounter === prevState.n) {
         return {
