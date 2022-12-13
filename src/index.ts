@@ -15,8 +15,8 @@ export type Winner = Player | 0;
 export type State = {
     rows: Record<number, Record<number, number>>; 
     cols: Record<number, Record<number, number>>;
-    diagonals: Record<string, Record<string, number>>;
-    coDiagonals: Record<string, Record<string, number>>;
+    diagonals: Record<string, Record<number, number>>;
+    coDiagonals: Record<string, Record<number, number>>;
     winner: Winner;
     currentPlayer: Player;
     n: number; // winnable condition
@@ -74,52 +74,6 @@ const count = (xs: Record<number, number>, initialCoord: number, player: Player)
     return leftCounter + rightCounter - 1;
 };
 
-const countDiagonal = (xs: Record<string, number>, point: Point, player: Player): number => {
-    let lx = point.x;
-    let ly = point.y;
-    let rx = point.x;
-    let ry = point.y;
-    let leftCounter = 0;
-    let rightCounter = 0;
-
-    while (xs[pointToString({x: lx, y: ly})] === player) {
-        lx--;
-        ly--;
-        leftCounter++;
-    }
-
-    while (xs[pointToString({x: rx, y: ry})] === player) {
-        rx++;
-        ry++;
-        rightCounter++;
-    }
-
-    return leftCounter + rightCounter - 1;
-};
-
-const countCoDiagonal = (xs: Record<string, number>, point: Point, player: Player): number => {
-    let lx = point.x;
-    let ly = point.y;
-    let rx = point.x;
-    let ry = point.y;
-    let leftCounter = 0;
-    let rightCounter = 0;
-
-    while (xs[pointToString({x: lx, y: ly})] === player) {
-        lx--;
-        ly++;
-        leftCounter++;
-    }
-
-    while (xs[pointToString({x: rx, y: ry})] === player) {
-        rx++;
-        ry--;
-        rightCounter++;
-    }
-
-    return leftCounter + rightCounter - 1;
-};
-
 export const move = (point: Point, player: Player) => (prevState: State): State => {
     const newState = { ...prevState };
     newState.rows = { ...prevState.rows };
@@ -139,11 +93,11 @@ export const move = (point: Point, player: Player) => (prevState: State): State 
     }
 
     if (diagonals[pointToString(diagonalPoint)] === undefined) {
-        diagonals[pointToString(diagonalPoint)] = {[pointToString(point)]: player};
+        diagonals[pointToString(diagonalPoint)] = {[point.x]: player};
     }
 
     if (coDiagonals[pointToString(coDiagonalPoint)] === undefined) {
-        coDiagonals[pointToString(coDiagonalPoint)] = {[pointToString(point)]: player};
+        coDiagonals[pointToString(coDiagonalPoint)] = {[point.x]: player};
     }
 
     const currentRow = rows[point.y];
@@ -169,8 +123,8 @@ export const move = (point: Point, player: Player) => (prevState: State): State 
     }
 
     const currentDiagonal = diagonals[pointToString(diagonalPoint)];
-    currentDiagonal[pointToString(point)] = player;
-    const diagonalCounter = countDiagonal(currentDiagonal, point, player);
+    currentDiagonal[point.x] = player;
+    const diagonalCounter = count(currentDiagonal, point.x, player);
 
     if (diagonalCounter === prevState.n) {
         return {
@@ -178,10 +132,10 @@ export const move = (point: Point, player: Player) => (prevState: State): State 
             winner: player,
         };
     }
-    
+
     const currentCoDiagonal = coDiagonals[pointToString(coDiagonalPoint)];
-    currentCoDiagonal[pointToString(point)] = player;
-    const coDiagonalCounter = countCoDiagonal(currentCoDiagonal, point, player);
+    currentCoDiagonal[point.x] = player;
+    const coDiagonalCounter = count(currentCoDiagonal, point.x, player);
 
     if (coDiagonalCounter === prevState.n) {
         return {
