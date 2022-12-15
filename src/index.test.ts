@@ -1,3 +1,4 @@
+import {shuffle} from 'lodash';
 import { defaultState, move, Player, compose, getDiagonalPoint, getCoDiagonalPoint } from ".";
 
 describe('Infinite tic-tac toe', () => {
@@ -324,4 +325,21 @@ describe('Infinite tic-tac toe', () => {
             expect(res.winner).toBe(Player.Second);
         });
     });
+
+    test('Works regadless of "Move" call order', () => {
+        const state = { ...defaultState, n: 3 };
+        const calls = shuffle([
+            move({x: 0, y: 0}, Player.First),
+            move({x: 5, y: 0}, Player.Second),
+            move({x: 1, y: 1}, Player.First),
+            move({x: 4, y: 1}, Player.Second),
+            move({x: 1, y: 0}, Player.First),
+            move({x: 0, y: 5}, Player.Second),
+            move({x: 3, y: 3}, Player.First),
+            move({x: 2, y: 3}, Player.Second),
+            move({x: 5, y: 5}, Player.First),
+            move({x: 1, y: 4}, Player.Second),
+        ]);
+        expect(compose(...calls)(state).winner).toBe(Player.Second);
+    })
 });
